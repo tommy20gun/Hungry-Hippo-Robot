@@ -1,7 +1,10 @@
+import pygame
 import cv2 as cv
 import numpy as np
 import imutils
-
+from ball import Ball
+from cart import Cart
+from game import PygameGame
 
 def rescaleFrame(frame, scale):
     width = int(frame.shape[1] * scale)
@@ -32,8 +35,16 @@ def detect_and_draw_balls(frame, lower_range, upper_range, color):
             # Get the bounding box of the contour
             (x, y, w, h) = cv.boundingRect(c)
 
+            # Calculate the center of the ball
+            center_x = x + w // 2
+            center_y = y + h // 2
+
             # Draw a rectangle around the contour
             cv.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+
+            # Display the coordinates of the center
+            text = f"({center_x}, {center_y})"
+            cv.putText(frame, text, (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
     return frame
 
@@ -78,8 +89,8 @@ while True:
     # Show the modified frame
     cv.imshow("Frame", frame_resized)
 
-    # Exit if the 'q' key is pressed
-    if cv.waitKey(20) & 0xFF==ord('d'):
+    # Exit if the 'd' key is pressed
+    if cv.waitKey(20) & 0xFF == ord('d'):
         break
 
 capture.release()
