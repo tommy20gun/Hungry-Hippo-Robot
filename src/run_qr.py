@@ -1,3 +1,4 @@
+#credits to https://github.com/TemugeB/QR_code_orientation_OpenCV
 import cv2 as cv
 import numpy as np
 import sys
@@ -91,9 +92,5 @@ if __name__ == '__main__':
 
     #read camera intrinsic parameters.
     cmtx, dist = read_camera_parameters()
-
-    input_source = 'media/test.mp4'
-    if len(sys.argv) > 1:
-        input_source = int(sys.argv[1])
-
+    input_source = 0
     show_axes(cmtx, dist, input_source)
