@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 from ball_detection import rescale_frame, detect_and_draw_balls
 from cart_detection import cart_detection
+from run_qr import plot_axes_on_frame
 
 
 # Store the HSV color values in another file to minimize clogging up the main script
@@ -22,7 +23,7 @@ def main():
                 frame_resized = detect_and_draw_balls(frame_resized, lower_ranges[color], upper_ranges[color], colors[color])
 
             # Perform cart detection and label rotation angle
-            frame_resized = cart_detection(frame_resized)
+            frame_resized = plot_axes_on_frame(frame_resized)
 
             # Show the modified frame
             cv.imshow("Frame", frame_resized)
