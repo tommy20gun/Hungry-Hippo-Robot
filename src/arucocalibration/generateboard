@@ -1,0 +1,27 @@
+import cv2
+import numpy as np
+
+# Set the dimensions of the marker board
+aruco_board_size = (4, 5)  # Number of internal corners (rows, columns)
+aruco_square_length = 100  # Length of each square in pixels
+
+# Create the dictionary for ArUco markers
+aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
+
+# Generate the ArUco marker board
+board = aruco_dict.drawMarker(0, aruco_square_length)
+for marker_id in range(1, aruco_board_size[0] * aruco_board_size[1]):
+    marker = aruco_dict.drawMarker(marker_id, aruco_square_length)
+    board = np.concatenate((board, marker), axis=1)
+
+# Create the chessboard pattern
+chessboard_pattern = np.zeros_like(board)
+chessboard_square_length = int(aruco_square_length * 0.8)  # Adjust the square size as needed
+chessboard_pattern[::2, ::2] = 255
+chessboard_pattern[1::2, 1::2] = 255
+
+# Combine the ArUco markers and chessboard pattern
+board = np.bitwise_or(board, chessboard_pattern)
+
+# Save the board image
+cv2.imwrite('marker_board.png', board)

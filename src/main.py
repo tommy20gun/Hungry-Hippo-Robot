@@ -27,6 +27,8 @@ def main():
             # Show the modified frame
             cv.imshow("Frame", frame_resized)
 
+            #sendserialdata(frame_resized)
+
             # Exit if the 'q' key is pressed
             if cv.waitKey(20) & 0xFF == ord('d'):
                 break
