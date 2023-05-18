@@ -1,7 +1,7 @@
 import socket
 
 # Set the IP address and port of the Raspberry Pi server
-IP_ADDRESS = "169.254.80.57"
+IP_ADDRESS = "192.168.147.134"
 PORT = 1025
 
 # Connect to the server

@@ -3,7 +3,7 @@ import serial
 import time
 
 # Set the IP address and port to listen on
-IP_ADDRESS = "169.254.80.57"
+#IP_ADDRESS = "192.168.147.134"
 PORT = 1025
 
 #set up the serial port
@@ -14,9 +14,9 @@ stop_bits = 1
 
 ser= serial.Serial(port,baudrate = baud_rate,parity = parity,stopbits = stop_bits )
 
-data = "Hello world!"
-while True:
+data = "M15515"
 
+while True:
     ser.write(data.encode())
     time.sleep(1)
 
@@ -24,7 +24,7 @@ ser.close()
 
 # Create a socket object and bind it to the IP address and port
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind((IP_ADDRESS, PORT))
+server_socket.bind(('', PORT))
 
 # Listen for incoming connections
 server_socket.listen()
