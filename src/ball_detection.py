@@ -11,6 +11,9 @@ def rescale_frame(frame, scale):
 
 
 def detect_and_draw_balls(frame, lower_range, upper_range, color):
+    #initialize location variable
+    location_x = None
+    location_y = None
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
     # Detect balls
@@ -43,4 +46,7 @@ def detect_and_draw_balls(frame, lower_range, upper_range, color):
             text = f"({center_x}, {center_y})"
             cv.putText(frame, text, (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-    return frame
+            location_x = center_x
+            location_y = center_y
+
+    return frame, location_x, location_y

@@ -16,12 +16,6 @@ ser= serial.Serial(port,baudrate = baud_rate,parity = parity,stopbits = stop_bit
 
 data = "M15515"
 
-while True:
-    ser.write(data.encode())
-    time.sleep(1)
-
-ser.close()
-
 # Create a socket object and bind it to the IP address and port
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(('', PORT))
@@ -36,8 +30,11 @@ while True:
     print("Received data: ", received_data)
 
     # Send a response back to the client
-    response = "Hello from the Raspberry Pi!"
+    response = f"Hello from the Raspberry Pi! msg: {received_data}"
     client_socket.sendall(response.encode())
+
+    #serial write data to the MCU
+    ser.write(data.encode())
 
     # Close the client socket
     client_socket.close()

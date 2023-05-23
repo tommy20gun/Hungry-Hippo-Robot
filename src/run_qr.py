@@ -1,12 +1,11 @@
-#credits to https://github.com/TemugeB/QR_code_orientation_OpenCV
-#for base code used for this implementation. 
 import cv2 as cv
 import numpy as np
-import sys
 
 
 def plot_axes_on_frame(frame):
     qr = cv.QRCodeDetector()
+    # Initialize variables for location and rotation. Set them as None so that the program can tell when there's no QR code.
+    center_x, center_y, angle = None, None, None
 
     ret_qr, points = qr.detect(frame)
 
@@ -72,7 +71,7 @@ def plot_axes_on_frame(frame):
                 text = f"({center_x}, {center_y})"
                 cv.putText(frame, text, (origin[0] + 10, origin[1] + 40), font, 1, (255, 255, 255), 2, cv.LINE_AA)
 
-    return frame
+    return frame, center_x, center_y, angle
 
 
 # Example usage
@@ -85,7 +84,12 @@ if __name__ == '__main__':
             break
 
         # Plot axes and angle on the frame
-        frame_with_axes = plot_axes_on_frame(img)
+        frame_with_axes, center_x, center_y, angle = plot_axes_on_frame(img)
+
+        # Check if an object is detected
+        if angle is not None:
+            print("QR code rotation angle:", angle)
+            print("QR code center: ({}, {})".format(center_x, center_y))
 
         # Display the frame
         cv.imshow('Frame', frame_with_axes)
