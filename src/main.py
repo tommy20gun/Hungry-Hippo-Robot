@@ -5,6 +5,7 @@ from ball_detection import rescale_frame, detect_and_draw_balls
 from run_qr import plot_axes_on_frame
 from Ball import Ball
 from Cart import Cart
+from sendserial import sendserialdata
 
 
 # Store the HSV color values in another file to minimize clogging up the main script
@@ -13,7 +14,7 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 
 def main():
-    capture = cv.VideoCapture(0, cv.CAP_DSHOW)
+    capture = cv.VideoCapture('balls.mp4') #0, cv.CAP_DSHOW)
 
     #initialize ball and cart list
     cart = None
@@ -24,7 +25,7 @@ def main():
         balls = []
         is_true, frame = capture.read()
         if is_true:
-            frame = rescale_frame(frame, 1)
+            frame = rescale_frame(frame, .5)
 
             # Detect and draw balls of different colors
             for color in colors:
@@ -32,7 +33,7 @@ def main():
                 if ball_x is not None:
                     #adds balls to the list of balls
                     balls.append(Ball(color,ball_x,ball_y))
-                    print(f"{balls.color} ball at ({balls.x},{balls.y})")
+                    print(balls)
 
         # Plot axes and angle on the frame
         frame, cart_x, cart_y, angle = plot_axes_on_frame(frame)
@@ -40,16 +41,16 @@ def main():
         # Check if an object is detected
         if cart_x is not None and cart_y is not None and angle is not None:
             
-            #assign variable values to cart[]
+            #assign variable values to cart
             cart = Cart(angle,cart_x,cart_y)
 
-            print("QR code rotation angle:", cart.angle)
-            print("QR code center: ({}, {})".format(cart.x, cart.y))
+            #print("QR code rotation angle:", cart.angle)
+            #print("QR code center: ({}, {})".format(cart.x, cart.y))
 
 
         # Display the frame
         cv.imshow('Frame', frame)
-            #sendserialdata(frame_resized)
+        sendserialdata(balls, cart)
 
             # Exit if the 'q' key is pressed
         if cv.waitKey(20) & 0xFF == ord('d'):
