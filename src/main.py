@@ -5,7 +5,9 @@ from ball_detection import rescale_frame, detect_and_draw_balls
 from run_qr import plot_axes_on_frame
 from Ball import Ball
 from Cart import Cart
-from sendserial import sendserialdata
+from PIDcalculator import getdutycycledata
+import socket
+from simple_pid import PID
 
 
 # Store the HSV color values in another file to minimize clogging up the main script
@@ -14,18 +16,32 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 
 def main():
-    capture = cv.VideoCapture('balls.mp4') #0, cv.CAP_DSHOW)
+    capture = cv.VideoCapture(0, cv.CAP_DSHOW)
+    rescalefactor = .5
 
     #initialize ball and cart list
     cart = None
     balls = None
+
+    #initializes Socket object to send serial data
+    """ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    IP_ADDRESS = "192.168.72.134"
+    PORT = 1025
+    s.connect((IP_ADDRESS, PORT)) """
+
+    #initialize PID object
+    pid = PID(.5,.1,.01, setpoint= 1)
     
     while True:
-        #resets ball to be extended
-        balls = []
-        is_true, frame = capture.read()
-        if is_true:
-            frame = rescale_frame(frame, .5)
+        #read the frames of the video as a while loop to make it "look" like a video
+        thereisaframe, frame = capture.read()
+        if thereisaframe:
+
+            frame = rescale_frame(frame, rescalefactor)
+
+            #resets ball and cart
+            balls = []
+            cart = None
 
             # Detect and draw balls of different colors
             for color in colors:
@@ -33,26 +49,31 @@ def main():
                 if ball_x is not None:
                     #adds balls to the list of balls
                     balls.append(Ball(color,ball_x,ball_y))
-                    print(balls)
+                    #print(balls)
 
         # Plot axes and angle on the frame
-        frame, cart_x, cart_y, angle = plot_axes_on_frame(frame)
+            frame, cart_x, cart_y, angle = plot_axes_on_frame(frame)
 
-        # Check if an object is detected
-        if cart_x is not None and cart_y is not None and angle is not None:
-            
-            #assign variable values to cart
-            cart = Cart(angle,cart_x,cart_y)
+            # Check if an object is detected
+            if cart_x is not None and cart_y is not None and angle is not None:
+                
+                #assign variable values to cart
+                cart = Cart(angle,cart_x,cart_y)
 
-            #print("QR code rotation angle:", cart.angle)
-            #print("QR code center: ({}, {})".format(cart.x, cart.y))
+                #print("QR code rotation angle:", cart.angle)
+                #print("QR code center: ({}, {})".format(cart.x, cart.y))
 
 
-        # Display the frame
-        cv.imshow('Frame', frame)
-        sendserialdata(balls, cart)
+            # Display the frame
+            cv.imshow('Frame', frame)
 
-            # Exit if the 'q' key is pressed
+            #send the data through serial to the MCU and echo it in terminal
+            data = getdutycycledata(balls, cart, pid)
+            #s.sendall(data.encode())
+            #received_data = s.recv(1024)
+            #print(received_data)
+
+        # Exit if the 'q' key is pressed
         if cv.waitKey(20) & 0xFF == ord('d'):
             break
 
