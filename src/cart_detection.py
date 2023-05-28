@@ -50,8 +50,11 @@ def plot_axes_on_frame(frame):
                         break
                     if p[0] > 5 * frame.shape[1] or p[1] > 5 * frame.shape[1]:
                         break
-
-                    cv.line(frame, origin, p, c, 5)
+                    
+                    try:
+                        cv.line(frame, origin, p, c, 5)
+                    except cv.error:
+                        pass
 
                 # Calculate the angle of rotation of the QR code
                 angle = np.arctan2(axis_points[1][1] - axis_points[0][1], axis_points[1][0] - axis_points[0][0])

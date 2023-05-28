@@ -2,12 +2,13 @@ import cv2 as cv
 import numpy as np
 from ball_detection import rescale_frame, detect_and_draw_balls
 #from cart_detection import cart_detection
-from run_qr import plot_axes_on_frame
+from cart_detection import plot_axes_on_frame
 from Ball import Ball
 from Cart import Cart
 from PIDcalculator import getdutycycledata
 import socket
 from simple_pid import PID
+import time
 
 
 # Store the HSV color values in another file to minimize clogging up the main script
@@ -16,8 +17,8 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 
 def main():
-    capture = cv.VideoCapture('balls.mp4')#0, cv.CAP_DSHOW)
-    rescalefactor = .5
+    capture = cv.VideoCapture(0, cv.CAP_DSHOW)
+    rescalefactor = 1
 
     #initialize ball and cart list
     cart = None
@@ -31,7 +32,11 @@ def main():
 
     #initialize PID object
     pid = PID(.5,.1,.01, setpoint= 1)
-    
+
+    #initialize framedetection counter
+    framedetectioncounter = 0
+    desiredframes = 2
+
     while True:
         #read the frames of the video as a while loop to make it "look" like a video
         thereisaframe, frame = capture.read()
@@ -51,15 +56,18 @@ def main():
                     balls.append(Ball(color,ball_x,ball_y))
                     #print(balls)
 
-        # Plot axes and angle on the frame
+            # Plot axes and angle on the frame
             frame, cart_x, cart_y, angle = plot_axes_on_frame(frame)
 
             # Check if an object is detected
             if cart_x is not None and cart_y is not None and angle is not None:
-                
-                #assign variable values to cart
-                cart = Cart(angle,cart_x,cart_y)
-
+                framedetectioncounter +=1
+                if framedetectioncounter >= desiredframes:
+                    #assign variable values to cart
+                    cart = Cart(angle,cart_x,cart_y)
+                    print(cart.x,cart.y)
+            else:
+                framedetectioncounter = 0
                 #print("QR code rotation angle:", cart.angle)
                 #print("QR code center: ({}, {})".format(cart.x, cart.y))
 
@@ -80,7 +88,7 @@ def main():
 
     capture.release()
     cv.destroyAllWindows()
-    s.close()
+    #s.close()
 
 
 if __name__ == '__main__':
