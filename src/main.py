@@ -8,8 +8,6 @@ from Cart import Cart
 from PIDcalculator import getdutycycledata
 import socket
 from simple_pid import PID
-import time
-
 
 # Store the HSV color values in another file to minimize clogging up the main script
 from hsvcolordata import lower_ranges, upper_ranges, colors
@@ -17,18 +15,18 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 
 def main():
-    capture = cv.VideoCapture(0, cv.CAP_DSHOW)
-    rescalefactor = 1
+    capture = cv.VideoCapture('ballandcart.mov')#0, cv.CAP_DSHOW)
+    rescalefactor = .5
 
     #initialize ball and cart list
     cart = None
     balls = None
 
     #initializes Socket object to send serial data
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    """s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     IP_ADDRESS = "169.254.80.57"
     PORT = 1025
-    s.connect((IP_ADDRESS, PORT)) 
+    s.connect((IP_ADDRESS, PORT)) """
 
     #initialize PID object
     pid = PID(.5,.1,.01, setpoint= 1)
@@ -65,7 +63,7 @@ def main():
                 if framedetectioncounter >= desiredframes:
                     #assign variable values to cart
                     cart = Cart(angle,cart_x,cart_y)
-                    print(cart.x,cart.y)
+                    #print(cart.x,cart.y)
             else:
                 framedetectioncounter = 0
                 #print("QR code rotation angle:", cart.angle)
@@ -78,9 +76,10 @@ def main():
             #send the data through serial to the MCU and echo it in terminal
             data = getdutycycledata(balls, cart, pid)
             if data:    
-                s.sendall(data.encode())
-                received_data = s.recv(1024)
-                print(received_data)
+             #   s.sendall(data.encode())
+              #  received_data = s.recv(1024)
+                #print(received_data)
+                print(data)
 
         # Exit if the 'q' key is pressed
         if cv.waitKey(20) & 0xFF == ord('d'):

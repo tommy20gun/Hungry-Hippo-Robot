@@ -58,7 +58,7 @@ def plot_axes_on_frame(frame):
 
                 # Calculate the angle of rotation of the QR code
                 angle = np.arctan2(axis_points[1][1] - axis_points[0][1], axis_points[1][0] - axis_points[0][0])
-                angle = np.degrees(angle)
+                angle = np.degrees(angle)-90
                 if angle < 0:
                     angle += 360
 
@@ -71,6 +71,7 @@ def plot_axes_on_frame(frame):
                 text = f"Rotation: {int(angle)} degrees"
                 cv.putText(frame, text, (origin[0] + 10, origin[1] + 10), font, 1, (255, 255, 255), 2, cv.LINE_AA)
 
+                cv.circle(frame,(center_x,center_y), 10, (0,0,255), thickness = 2)
                 text = f"({center_x}, {center_y})"
                 cv.putText(frame, text, (origin[0] + 10, origin[1] + 40), font, 1, (255, 255, 255), 2, cv.LINE_AA)
 

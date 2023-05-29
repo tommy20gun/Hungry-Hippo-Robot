@@ -1,7 +1,8 @@
 import cv2 as cv
 import numpy as np
 import imutils
-
+from hsvcolordata import lower_ranges, upper_ranges, colors
+from Ball import Ball
 
 def rescale_frame(frame, scale):
     width = int(frame.shape[1] * scale)
@@ -31,7 +32,7 @@ def detect_and_draw_balls(frame, lower_range, upper_range, color):
         circularity = 4 * np.pi * area / (perimeter * perimeter)
 
         # Ignore small or non-circular contours
-        if area > 500 and circularity > 0.8:
+        if area > 50 and circularity > 0.8:
             # Get the bounding box of the contour
             (x, y, w, h) = cv.boundingRect(c)
 
@@ -50,3 +51,29 @@ def detect_and_draw_balls(frame, lower_range, upper_range, color):
             location_y = center_y
 
     return frame, location_x, location_y
+
+if __name__ == "__main__":
+
+    capture = cv.VideoCapture('ballandcart.MOV')
+    balls = []
+
+    while True:
+        thereisaframe, frame = capture.read()
+        if thereisaframe:
+            frame = rescale_frame(frame, 0.5)
+
+            for color in colors:
+                frame,ball_x, ball_y, mask = detect_and_draw_balls(frame, lower_ranges[color], upper_ranges[color], colors[color])
+                if ball_x is not None:
+                    #adds balls to the list of balls
+                    balls.append(Ball(color,ball_x,ball_y))
+
+            
+            cv.imshow("frame", mask)
+
+        if cv.waitKey(20) & 0xFF == ord('d'):
+            break
+    
+    capture.release()
+    cv.destroyAllWindows()
+

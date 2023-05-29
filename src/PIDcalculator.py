@@ -46,7 +46,7 @@ def rotate(balls, cart):
         dutycycle = []
         
         #gives the range of rotation 6 degrees. If the cart is within +- 3 degrees of the desired angle, it will stop rotating.
-        if not (abs(angle_deg - cart.angle) <= 3 or abs(angle_deg - cart.angle + 360) <= 3 or abs(angle_deg - cart.angle - 360) <= 3):
+        if not (abs(angle_deg - cart.angle) <= 6 or abs(angle_deg - cart.angle + 360) <= 6 or abs(angle_deg - cart.angle - 360) <= 6):
             dutycycle.append(30)
             dutycycle.append("D0")
             return dutycycle[0],dutycycle[1]
@@ -65,9 +65,9 @@ def proportionaldrive(balls, cart, pid):
         distance = (math.hypot(ballx-cart.x,bally-cart.y))
         
         #apply pid controller and also int cast the output
-        #dutycyclepercent  = int(pid(distance))
-        kp = 0.5
-        dutycyclepercent  = abs(kp*distance) 
+        dutycyclepercent  = int(pid(distance))
+        #kp = 0.5
+        #dutycyclepercent  = abs(kp*distance) 
 
         if dutycyclepercent > 128:
             dutycyclepercent = 0x7f
