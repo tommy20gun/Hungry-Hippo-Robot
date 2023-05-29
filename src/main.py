@@ -15,7 +15,7 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 
 def main():
-    capture = cv.VideoCapture('ballandcart.mov')#0, cv.CAP_DSHOW)
+    capture = cv.VideoCapture('toes.mov')#0, cv.CAP_DSHOW)
     rescalefactor = .5
 
     #initialize ball and cart list
@@ -29,11 +29,12 @@ def main():
     s.connect((IP_ADDRESS, PORT)) """
 
     #initialize PID object
-    pid = PID(.5,.1,.01, setpoint= 1)
+    pid = PID(.2,3,.01, setpoint= 0)
 
     #initialize framedetection counter
     framedetectioncounter = 0
     desiredframes = 2
+    previousdata = ""
 
     while True:
         #read the frames of the video as a while loop to make it "look" like a video
@@ -75,11 +76,15 @@ def main():
 
             #send the data through serial to the MCU and echo it in terminal
             data = getdutycycledata(balls, cart, pid)
-            if data:    
+
+            if data:
+                #this fixes the random noise of rotation
+                if not (data[8:10] == "D0" and previousdata[8:10] != "D0"):    
              #   s.sendall(data.encode())
               #  received_data = s.recv(1024)
                 #print(received_data)
-                print(data)
+                    print(data)
+                previousdata= data
 
         # Exit if the 'q' key is pressed
         if cv.waitKey(20) & 0xFF == ord('d'):
