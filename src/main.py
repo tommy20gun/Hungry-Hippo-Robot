@@ -15,18 +15,19 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 
 def main():
-    capture = cv.VideoCapture('toes.mov')#0, cv.CAP_DSHOW)
-    rescalefactor = .5
+    #capture = cv.imread('Screenshot.png')
+    capture = cv.VideoCapture(0, cv.CAP_DSHOW)
+    rescalefactor = 0.5
 
     #initialize ball and cart list
     cart = None
     balls = None
 
     #initializes Socket object to send serial data
-    """s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     IP_ADDRESS = "169.254.80.57"
     PORT = 1025
-    s.connect((IP_ADDRESS, PORT)) """
+    s.connect((IP_ADDRESS, PORT))
 
     #initialize PID object
     pid = PID(.2,3,.01, setpoint= 0)
@@ -36,11 +37,15 @@ def main():
     desiredframes = 2
     previousdata = ""
 
+    pause = False
+
     while True:
         #read the frames of the video as a while loop to make it "look" like a video
         thereisaframe, frame = capture.read()
-        if thereisaframe:
+        #thereisaframe = True
+        if thereisaframe and not pause:
 
+            #frame = cv.imread('Screenshot.png')
             frame = rescale_frame(frame, rescalefactor)
 
             #resets ball and cart
@@ -80,15 +85,23 @@ def main():
             if data:
                 #this fixes the random noise of rotation
                 if not (data[8:10] == "D0" and previousdata[8:10] != "D0"):    
-             #   s.sendall(data.encode())
-              #  received_data = s.recv(1024)
-                #print(received_data)
+                    s.sendall(data.encode())
+                    received_data = s.recv(1024)
+                    print(received_data)
                     print(data)
                 previousdata= data
 
+        key = cv.waitKey(20)
         # Exit if the 'q' key is pressed
-        if cv.waitKey(20) & 0xFF == ord('d'):
+        if key == ord('d'):
             break
+
+        elif key == ord(' '):
+            pause = not pause
+            
+            s.sendall("pause".encode())
+            received_data = s.recv(1024)
+            print(received_data)
 
     capture.release()
     cv.destroyAllWindows()

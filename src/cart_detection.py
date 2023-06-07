@@ -17,13 +17,16 @@ def plot_axes_on_frame(frame):
                              [1, 0, 0]], dtype='float32').reshape((4, 1, 3))
 
         # Hard-coded camera intrinsic parameters
-        cmtx = np.array([[910.1155107777962, 0.0, 360.3277519024787],
-                         [0.0, 910.2233367566544, 372.6634999577232],
+        #cmtx = np.array([[910.1155107777962, 0.0, 360.3277519024787],
+        #                 [0.0, 910.2233367566544, 372.6634999577232],
+        #                 [0.0, 0.0, 1.0]])
+        cmtx = np.array([[1394.602729, 0.0, 995.58867569],
+                         [0.0, 1394.6027293299, 599.321292848],
                          [0.0, 0.0, 1.0]])
-
+    
         # Hard-coded distortion parameters
-        dist = np.array([0.0212284835698144, 0.8546829039917951, 0.0034281408326615323, 0.0005749116561059772, -3.217248182814475])
-
+        #dist = np.array([0.0212284835698144, 0.8546829039917951, 0.0034281408326615323, 0.0005749116561059772, -3.217248182814475])
+        dist = np.array([0.1148080607, -0.219469856538, 0.001200211699, 0.0008564577708855, 0.1127467713085])
         # Determine the orientation of QR code coordinate system with respect to camera coordinate system.
         ret, rvec, tvec = cv.solvePnP(qr_edges, points, cmtx, dist)
 

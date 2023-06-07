@@ -22,6 +22,7 @@ public:
                  uint32_t _ch1,
                  uint32_t _ch2,
                  uint8_t _direction);
+
     void enable_driver();
     void disable_driver();
     void set_duty_cycle(uint16_t dc);

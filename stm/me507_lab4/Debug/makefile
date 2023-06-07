@@ -75,8 +75,8 @@ all: main-build
 main-build: me507_lab4.elf secondary-outputs
 
 # Tool invocations
-me507_lab4.elf me507_lab4.map: $(OBJS) $(USER_OBJS) C:\Users\Ryan\STM32CubeIDE\workspace_1.12.0\me507_lab4\STM32F411CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "me507_lab4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Ryan\STM32CubeIDE\workspace_1.12.0\me507_lab4\STM32F411CEUX_FLASH.ld" -Wl,-Map="me507_lab4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+me507_lab4.elf me507_lab4.map: $(OBJS) $(USER_OBJS) C:\Users\tommy\Downloads\opencv-camera-main\src\opencv-camera\stm\me507_lab4\STM32F411CEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "me507_lab4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\tommy\Downloads\opencv-camera-main\src\opencv-camera\stm\me507_lab4\STM32F411CEUX_FLASH.ld" -Wl,-Map="me507_lab4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
