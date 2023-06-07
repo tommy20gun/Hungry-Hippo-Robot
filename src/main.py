@@ -16,18 +16,18 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 def main():
     #capture = cv.imread('Screenshot.png')
-    capture = cv.VideoCapture(0, cv.CAP_DSHOW)
-    rescalefactor = 0.5
+    capture = cv.VideoCapture(2, cv.CAP_DSHOW)
+    rescalefactor = 1
 
     #initialize ball and cart list
     cart = None
     balls = None
 
     #initializes Socket object to send serial data
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    """s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     IP_ADDRESS = "169.254.80.57"
     PORT = 1025
-    s.connect((IP_ADDRESS, PORT))
+    s.connect((IP_ADDRESS, PORT))"""
 
     #initialize PID object
     pid = PID(.2,3,.01, setpoint= 0)
@@ -85,9 +85,9 @@ def main():
             if data:
                 #this fixes the random noise of rotation
                 if not (data[8:10] == "D0" and previousdata[8:10] != "D0"):    
-                    s.sendall(data.encode())
-                    received_data = s.recv(1024)
-                    print(received_data)
+                    #s.sendall(data.encode())
+                    #received_data = s.recv(1024)
+                    #print(received_data)
                     print(data)
                 previousdata= data
 
@@ -99,9 +99,9 @@ def main():
         elif key == ord(' '):
             pause = not pause
             
-            s.sendall("pause".encode())
-            received_data = s.recv(1024)
-            print(received_data)
+            #s.sendall("pause".encode())
+            #received_data = s.recv(1024)
+            #print(received_data)
 
     capture.release()
     cv.destroyAllWindows()
