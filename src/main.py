@@ -16,7 +16,7 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 def main():
     #capture = cv.imread('Screenshot.png')
-    capture = cv.VideoCapture(2, cv.CAP_DSHOW)
+    capture = cv.VideoCapture(0, cv.CAP_DSHOW)
     rescalefactor = 1
 
     #initialize ball and cart list
