@@ -24,6 +24,7 @@ def main():
     #initialize ball and cart list
     cart = None
     balls = None
+    corralstation = None
 
     #initializes Socket object to send serial data
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,7 +36,8 @@ def main():
     pid = PID(.2,3,.01, setpoint= 0)
 
     #initialize framedetection counter
-    framedetectioncounter = 0
+    cartframedetectioncounter = 0
+    ballframedetectioncounter = 0
     desiredframes = 2
     previousdata = ""
 
@@ -63,33 +65,47 @@ def main():
                     #adds balls to the list of balls
                     balls.append(Ball(color,ball_x,ball_y))
                     #print(balls)
-                #else:
-                    #s.sendall("state3".encode())
-                    #received_data = s.recv(1024)
-                    #print(received_data)
-                    #print("no more balls")
 
             # Plot axes and angle on the frame
             frame, cart_x, cart_y, angle = plot_axes_on_frame(frame)
 
             # Check if an object is detected
             if cart_x is not None and cart_y is not None and angle is not None:
-                framedetectioncounter +=1
-                if framedetectioncounter >= desiredframes:
+                cartframedetectioncounter +=1
+                if cartframedetectioncounter >= desiredframes:
                     #assign variable values to cart
                     cart = Cart(angle,cart_x,cart_y)
                     #print(cart.x,cart.y)
             else:
-                framedetectioncounter = 0
+                cartframedetectioncounter = 0
                 #print("QR code rotation angle:", cart.angle)
                 #print("QR code center: ({}, {})".format(cart.x, cart.y))
 
+            #chekcs if there are no balls for a long time, at 20 frames of no balls, the program exits
+            if balls == []:
+                ballframedetectioncounter += 1
+                if ballframedetectioncounter >= 20:
+                    print("no more balls")
+                    corralstation = Ball("yellow", 500, 500)
+
+            else: 
+                ballframedetectioncounter = 0
 
             # Display the frame
             cv.imshow('Frame', frame)
 
             #send the data through serial to the MCU and echo it in terminal
-            data = getdutycycledata(balls, cart, pid)
+            
+            if corralstation is not None:
+                data = getdutycycledata(corralstation, cart, pid)
+                #if the cart is close to the corral station
+                if (cart.x - corralstation.x) <= 30 and (cart.y - corralstation.y) <= 30:
+                    #s.sendall("state3".encode())
+                    #received_data = s.recv(1024)
+                    #print(received_data)
+                    print("State3")
+            else:
+                data = getdutycycledata(balls, cart, pid)
 
             if data:
                 #this fixes the random noise of rotation
@@ -105,6 +121,7 @@ def main():
         if key == ord('d'):
             break
 
+        #emergency kill button with space bar
         elif key == ord(' '):
             pause = not pause
             
