@@ -32,7 +32,7 @@ def detect_and_draw_balls(frame, lower_range, upper_range, color):
         circularity = 4 * np.pi * area / (perimeter * perimeter)
 
         # Ignore small or non-circular contours
-        if area > 50 and circularity > 0.8:
+        if area > 200 and circularity > 0.6:
             # Get the bounding box of the contour
             (x, y, w, h) = cv.boundingRect(c)
 

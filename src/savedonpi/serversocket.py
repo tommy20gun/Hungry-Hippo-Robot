@@ -21,8 +21,11 @@ ser = serial.Serial(port, baudrate=baud_rate, parity=parity, stopbits=stop_bits)
 
 GPIO.setmode(GPIO.BCM)
 gpio_pin = 17
+gpio_pin2 = 27
 GPIO.setup(gpio_pin, GPIO.OUT)
+GPIO.setup(gpio_pin2, GPIO.OUT)
 #initially set up the gpio pin to low
+GPIO.output(gpio_pin,GPIO.LOW)
 GPIO.output(gpio_pin,GPIO.LOW)
 
 
@@ -48,13 +51,17 @@ while True:
         client_socket.sendall(response.encode())
 
         # serial write data to the MCU, except for pause string.
-        if received_data != "pause":
-            ser.write(received_data.encode())
-            print("Sent data:", received_data)
-        elif received_data == "pause":
+        
+        if received_data == "pause":
             GPIO.output(gpio_pin, not GPIO.input(gpio_pin))
             pin_state = GPIO.input(gpio_pin)
-            print(f"Toggled gpio to: {pin_state}")
-        
+            print(f"Toggled {gpio_pin} to: {pin_state}")
+        elif received_data == "state3":
+            GPIO.output(gpio_pin2, not GPIO.input(gpio_pin2))
+            pin_state = GPIO.input(gpio_pin2)
+            print(f"Toggled {gpio_pin2} to: {pin_state}")
+        else:
+            ser.write(received_data.encode())
+            print("Sent data:", received_data)
 
     client_socket.close()

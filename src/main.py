@@ -8,6 +8,7 @@ from Cart import Cart
 from PIDcalculator import getdutycycledata
 import socket
 from simple_pid import PID
+from CameraBufferCleaner import CameraBufferCleanerThread
 
 # Store the HSV color values in another file to minimize clogging up the main script
 from hsvcolordata import lower_ranges, upper_ranges, colors
@@ -16,18 +17,19 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 def main():
     #capture = cv.imread('Screenshot.png')
-    capture = cv.VideoCapture(0, cv.CAP_DSHOW)
-    rescalefactor = 1
+    capture = cv.VideoCapture(1, cv.CAP_DSHOW)
+    cam_cleaner = CameraBufferCleanerThread(capture)
+    rescalefactor = .7
 
     #initialize ball and cart list
     cart = None
     balls = None
 
     #initializes Socket object to send serial data
-    """s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    IP_ADDRESS = "169.254.80.57"
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    IP_ADDRESS = "192.168.84.134"
     PORT = 1025
-    s.connect((IP_ADDRESS, PORT))"""
+    s.connect((IP_ADDRESS, PORT))
 
     #initialize PID object
     pid = PID(.2,3,.01, setpoint= 0)
@@ -41,13 +43,15 @@ def main():
 
     while True:
         #read the frames of the video as a while loop to make it "look" like a video
-        thereisaframe, frame = capture.read()
+
+        #thereisaframe, frame = capture.read()
+
         #thereisaframe = True
-        if thereisaframe and not pause:
-
+        #if thereisaframe and not pause:
+        if cam_cleaner.last_frame is not None:
             #frame = cv.imread('Screenshot.png')
-            frame = rescale_frame(frame, rescalefactor)
-
+            #frame = rescale_frame(frame, rescalefactor)
+            frame = rescale_frame(cam_cleaner.last_frame, rescalefactor)
             #resets ball and cart
             balls = []
             cart = None
@@ -59,6 +63,11 @@ def main():
                     #adds balls to the list of balls
                     balls.append(Ball(color,ball_x,ball_y))
                     #print(balls)
+                #else:
+                    #s.sendall("state3".encode())
+                    #received_data = s.recv(1024)
+                    #print(received_data)
+                    #print("no more balls")
 
             # Plot axes and angle on the frame
             frame, cart_x, cart_y, angle = plot_axes_on_frame(frame)
@@ -85,10 +94,10 @@ def main():
             if data:
                 #this fixes the random noise of rotation
                 if not (data[8:10] == "D0" and previousdata[8:10] != "D0"):    
-                    #s.sendall(data.encode())
-                    #received_data = s.recv(1024)
-                    #print(received_data)
-                    print(data)
+                    s.sendall(data.encode())
+                    received_data = s.recv(1024)
+                    print(received_data)
+                    #print(data)
                 previousdata= data
 
         key = cv.waitKey(20)
@@ -99,9 +108,9 @@ def main():
         elif key == ord(' '):
             pause = not pause
             
-            #s.sendall("pause".encode())
-            #received_data = s.recv(1024)
-            #print(received_data)
+            s.sendall("pause".encode())
+            received_data = s.recv(1024)
+            print(received_data)
 
     capture.release()
     cv.destroyAllWindows()
