@@ -24,6 +24,7 @@ def main():
     #initialize ball and cart list
     cart = None
     balls = None
+    color = "yellow"
 
     #initializes Socket object to send serial data
     """s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -56,11 +57,12 @@ def main():
             cart = None
 
             # Detect and draw balls of different colors
-            for color in colors:
-                frame,ball_x, ball_y = detect_and_draw_balls(frame, lower_ranges[color], upper_ranges[color], colors[color])
-                if ball_x:
-                    balls.append(Ball(color,ball_x,ball_y))
-                    break
+            #for color in colors:
+            
+            frame,ball_x, ball_y = detect_and_draw_balls(frame, lower_ranges[color], upper_ranges[color], colors[color])
+            if ball_x:
+                balls.append(Ball(color,ball_x,ball_y))
+                #break
                 #if ball_x is not None:
                     #adds balls to the list of balls
                     #balls.append(Ball(color,ball_x,ball_y))
@@ -72,6 +74,7 @@ def main():
                     #print("no more balls")
 
             # Plot axes and angle on the frame
+            
             frame, cart_x, cart_y, angle = plot_axes_on_frame(frame)
 
             # Check if an object is detected
@@ -126,7 +129,9 @@ if __name__ == '__main__':
 camera intiialization
 while true:
     find 1 ball
-    cart pick up ball
+    while true:
+        cart pick up ball
+
     if no more balls:
         break
     """
