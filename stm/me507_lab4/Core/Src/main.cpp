@@ -234,10 +234,21 @@ int main(void)
      */
 
 
+  enableAllMotors();
+  driver1.set_duty_cycle(0x40);
+  driver2.set_duty_cycle(0xD0);
+  servo1.set_duty_cycle(10);
+  servo1.set_duty_cycle(15);
+  servo1.set_duty_cycle(20);
+
+
     while (1)
     {
     	//start
     	if (state == 0){
+
+    		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0, GPIO_PIN_SET);
+    		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0, GPIO_PIN_RESET);
 
     		//interrupt will change the state to 1 to begin the program.
 
@@ -246,6 +257,7 @@ int main(void)
     	//state 1: listen to UART 1 and pick up balls
     	else if (state ==1){
     		 //the motor drivers get enabled when coming into this state.
+
 
 
 
@@ -896,7 +908,7 @@ static void MX_GPIO_Init(void)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if(huart == &huart1 && state ==1) {
     	HAL_UART_Receive_IT(&huart1, (uint8_t*)&data, 1);
-        HAL_UART_Transmit(&huart2, (uint8_t*)&data, 1, 1000);
+        //HAL_UART_Transmit(&huart2, (uint8_t*)&data, 1, 1000);
 
         if(data == '\r' && buff_idx >= 4) {
             //check for M
@@ -944,7 +956,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
                 size = sprintf(msg_buff, "\nMotor %d set to forward at duty cycle %d\r\n", driver_idx, dc);
             else
                 size = sprintf(msg_buff, "\nMotor %d set to reverse at duty cycle %d\r\n", driver_idx, dc);
-            HAL_UART_Transmit(&huart2, (uint8_t*)msg_buff, size, 1000);
+            //HAL_UART_Transmit(&huart2, (uint8_t*)msg_buff, size, 1000);
         }
         else if(buff_idx < 100) {
             msg_buff[buff_idx] = data;
@@ -959,7 +971,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		if (state == 0){
 			state = 1;
 			//i2c stuff
-			colorSensor_Init();
+			//colorSensor_Init();
 			//driver enable
 			enableAllMotors();
 			HAL_UART_Receive_IT(&huart1, (uint8_t*)&data, 1);

@@ -1,0 +1,24 @@
+gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	1
+main.cpp:111:5:int getADCsimplified()	1
+main.cpp:122:6:void colorSensor_Init()	1
+stl_algobase.h:254:5:constexpr const _Tp& std::max(const _Tp&, const _Tp&) [with _Tp = short unsigned int]	2
+main.cpp:137:13:std::string colorSensor_DetermineColor()	5
+main.cpp:162:6:void enableAllMotors()	1
+main.cpp:172:6:void disableAllMotors()	1
+main.cpp:187:5:int main()	12
+main.cpp:399:6:void SystemClock_Config()	3
+main.cpp:445:13:void MX_ADC1_Init()	3
+main.cpp:497:13:void MX_I2C2_Init()	2
+main.cpp:531:13:void MX_TIM1_Init()	5
+main.cpp:596:13:void MX_TIM2_Init()	6
+main.cpp:655:13:void MX_TIM3_Init()	7
+main.cpp:716:13:void MX_TIM4_Init()	7
+main.cpp:777:13:void MX_TIM5_Init()	5
+main.cpp:830:13:void MX_USART1_UART_Init()	2
+main.cpp:863:13:void MX_GPIO_Init()	1
+main.cpp:908:6:void HAL_UART_RxCpltCallback(UART_HandleTypeDef*)	12
+main.cpp:968:6:void HAL_GPIO_EXTI_Callback(uint16_t)	8
+main.cpp:1022:6:void Error_Handler()	1
+basic_string.h:6197:5:bool std::operator==(const std::__cxx11::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*) [with _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]	1
+main.cpp:1031:1:void __static_initialization_and_destruction_0(int, int)	3
+main.cpp:1031:1:cpp)	1
