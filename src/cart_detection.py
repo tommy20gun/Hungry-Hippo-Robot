@@ -79,7 +79,10 @@ def plot_axes_on_frame(frame):
                 text = f"Rotation: {int(angle)} degrees"
                 cv.putText(frame, text, (origin[0] + 10, origin[1] + 10), font, 1, (255, 255, 255), 2, cv.LINE_AA)
 
-                cv.circle(frame,(center_x,center_y), 10, (0,0,255), thickness = 2)
+                try:
+                    cv.circle(frame,(center_x,center_y), 10, (0,0,255), thickness = 2)
+                except:
+                    pass
                 text = f"({center_x}, {center_y})"
                 cv.putText(frame, text, (origin[0] + 10, origin[1] + 40), font, 1, (255, 255, 255), 2, cv.LINE_AA)
 

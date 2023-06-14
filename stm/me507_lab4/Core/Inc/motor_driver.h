@@ -16,12 +16,14 @@ private:
     uint32_t            ch1;
     uint32_t            ch2;
     uint8_t             direction;  // 0 = forward, 1 = reverse
+    uint8_t 			polarity;
 
 public:
     motor_driver(TIM_HandleTypeDef* _htim,
                  uint32_t _ch1,
                  uint32_t _ch2,
-                 uint8_t _direction);
+                 uint8_t _direction,
+				 uint8_t _polarity);
 
     void enable_driver();
     void disable_driver();

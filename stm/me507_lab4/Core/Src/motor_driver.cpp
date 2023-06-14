@@ -10,11 +10,15 @@
 motor_driver::motor_driver(TIM_HandleTypeDef* _htim,
                            uint32_t _ch1,
                            uint32_t _ch2,
-                           uint8_t _direction)
+                           uint8_t _direction,
+						   uint8_t _polarity)
+
     :htim(_htim),
      ch1(_ch1),
      ch2(_ch2),
-     direction(_direction)
+     direction(_direction),
+	 //polarity 1 is reverse. 0 is normal
+	 polarity(_polarity)
 {
 
 }
@@ -42,6 +46,13 @@ void motor_driver::set_duty_cycle(uint16_t dc) {
     }
 }
 
-void motor_driver::set_direction(uint8_t direction) {
-    this->direction = direction;
+void motor_driver::set_direction(uint8_t direction ) {
+    if (polarity == 1){
+    	this->direction = direction^1;
+    }
+    else {
+    	this->direction = direction;
+    }
+
 }
+

@@ -17,7 +17,7 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 def main():
     #capture = cv.imread('Screenshot.png')
-    capture = cv.VideoCapture(2, cv.CAP_DSHOW)
+    capture = cv.VideoCapture(1, cv.CAP_DSHOW)#'rtsp://192.168.84.58:8080/h264.sdp') #, cv.CAP_DSHOW)#2, cv.CAP_DSHOW)
     cam_cleaner = CameraBufferCleanerThread(capture)
     rescalefactor = .7
 
@@ -28,7 +28,8 @@ def main():
 
     #initializes Socket object to send serial data
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    IP_ADDRESS = "169.254.80.57"
+    #IP_ADDRESS = "169.254.80.57"
+    IP_ADDRESS = "192.168.84.134"
     PORT = 1025
     s.connect((IP_ADDRESS, PORT))
 

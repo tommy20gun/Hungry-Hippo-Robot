@@ -64,11 +64,11 @@ UART_HandleTypeDef huart1;
 int state = 0;
 int oldstate = 0;
 
-motor_driver driver1 = motor_driver(&htim5, TIM_CHANNEL_3, TIM_CHANNEL_4, 0);
-motor_driver driver2 = motor_driver(&htim3, TIM_CHANNEL_1, TIM_CHANNEL_2, 0);
-motor_driver driver3 = motor_driver(&htim3, TIM_CHANNEL_3, TIM_CHANNEL_4, 0);
-motor_driver driver4 = motor_driver(&htim4, TIM_CHANNEL_1, TIM_CHANNEL_2, 0);
-motor_driver driver5 = motor_driver(&htim4, TIM_CHANNEL_3, TIM_CHANNEL_4, 0);
+motor_driver driver1 = motor_driver(&htim5, TIM_CHANNEL_3, TIM_CHANNEL_4, 0, 0);
+motor_driver driver2 = motor_driver(&htim3, TIM_CHANNEL_1, TIM_CHANNEL_2, 0, 1);
+motor_driver driver3 = motor_driver(&htim3, TIM_CHANNEL_3, TIM_CHANNEL_4, 0, 0);
+motor_driver driver4 = motor_driver(&htim4, TIM_CHANNEL_1, TIM_CHANNEL_2, 0, 0);
+motor_driver driver5 = motor_driver(&htim4, TIM_CHANNEL_3, TIM_CHANNEL_4, 0, 0);
 servo_driver servo1 = servo_driver(&htim1, TIM_CHANNEL_1);
 servo_driver servo2 = servo_driver(&htim2, TIM_CHANNEL_1);
 
@@ -142,18 +142,24 @@ std::string colorSensor_DetermineColor(){
 		redValue = (colorData[3] << 8) | colorData[2];
 		blueValue = (colorData[5] << 8) | colorData[4];
 
-		/*blueValue / greenValue > 2
-			return "Blue"
-		redValue / green
-			return "Red"
-		green = blue
-			return "Yellow"
-		green / blue > 2
-			return "Green"
-		if (green-red)/((green+red)/2) < 0.2
-			return "No dominant color"
+		/*
+		if (blueValue / greenValue > 1.5) {
+			return "Blue";
+			}
+		else if (redValue / greenValue > 2) {
+			return "Red";
+			}
+		else if (redValue/ greenValue < 1 ){
+			return "Yellow";
+			}
+		else if (greenValue / blueValue > 2){
+			return "Green";
+			}
+		else {//((greenValue-redValue)/((greenValue+redValue)/2) < 0.2){
+			return "No dominant color";
+			}
 
-			*/
+		*/
 		//This algorithm was written by chat GPT to find the max int value.
 		int maxValue = std::max(std::max(greenValue, redValue), blueValue);
 
@@ -165,6 +171,7 @@ std::string colorSensor_DetermineColor(){
 			return "Red";
 		else
 			return "No dominant color";
+
 
 }
 
@@ -288,8 +295,8 @@ int main(void)
     		//drives backwards until the light sensor tells us its back on track
     		driver1.set_direction(1);
     		driver2.set_direction(1);
-    		driver1.set_duty_cycle(1000);
-    		driver2.set_duty_cycle(1000);
+    		driver1.set_duty_cycle(1700);
+    		driver2.set_duty_cycle(1700);
 
 
     		//checks the light sensor so that when the robot is back on the field, it will return to state 1.
@@ -976,7 +983,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		if (state == 0){
 			state = 1;
 			//i2c stuff
-			colorSensor_Init();
+			//colorSensor_Init();
 			//driver enable
 			enableAllMotors();
 			HAL_UART_Receive_IT(&huart1, (uint8_t*)&data, 1);
@@ -994,7 +1001,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	}
 	else if (GPIO_Pin == GPIO_PIN_12){
 		if (state ==1){
-			state = 3;
+			//state = 3;
 		}
 		else if (state == 3){
 			state = 0;
