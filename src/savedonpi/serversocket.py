@@ -44,10 +44,10 @@ while True:
         if not received_data:
             break
         
-        print("Received data:", received_data)
+        print("Received data from CPython:", received_data)
 
         # allow the raspberrypi to echo response back to the client
-        response = f"Hello from the Raspberry Pi! msg: {received_data}"
+        response = f"Received from Raspberry Pi! msg: {received_data}"
         client_socket.sendall(response.encode())
 
         # serial write data to the MCU, except for pause string.
@@ -62,6 +62,6 @@ while True:
             print(f"Toggled {gpio_pin2} to: {pin_state}")
         else:
             ser.write(received_data.encode())
-            print("Sent data:", received_data)
+            print("Sent data to MCU:", received_data)
 
     client_socket.close()

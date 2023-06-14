@@ -17,7 +17,7 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 def main():
     #capture = cv.imread('Screenshot.png')
-    capture = cv.VideoCapture(1, cv.CAP_DSHOW)
+    capture = cv.VideoCapture(2, cv.CAP_DSHOW)
     cam_cleaner = CameraBufferCleanerThread(capture)
     rescalefactor = .7
 
@@ -28,7 +28,7 @@ def main():
 
     #initializes Socket object to send serial data
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    IP_ADDRESS = "192.168.84.134"
+    IP_ADDRESS = "169.254.80.57"
     PORT = 1025
     s.connect((IP_ADDRESS, PORT))
 
@@ -42,6 +42,7 @@ def main():
     previousdata = ""
 
     pause = False
+   
 
     while True:
         #read the frames of the video as a while loop to make it "look" like a video
@@ -85,8 +86,9 @@ def main():
             if balls == []:
                 ballframedetectioncounter += 1
                 if ballframedetectioncounter >= 20:
-                    print("no more balls")
-                    corralstation = Ball("yellow", 500, 500)
+                    #print("no more balls")
+                    #corralstation = Ball("yellow", 500, 500)
+                    pass
 
             else: 
                 ballframedetectioncounter = 0
@@ -96,7 +98,7 @@ def main():
 
             #send the data through serial to the MCU and echo it in terminal
             
-            if corralstation is not None:
+            """if corralstation is not None:
                 data = getdutycycledata(corralstation, cart, pid)
                 #if the cart is close to the corral station
                 if (cart.x - corralstation.x) <= 30 and (cart.y - corralstation.y) <= 30:
@@ -104,8 +106,9 @@ def main():
                     #received_data = s.recv(1024)
                     #print(received_data)
                     print("State3")
-            else:
-                data = getdutycycledata(balls, cart, pid)
+            else:"""
+
+            data = getdutycycledata(balls, cart, pid)
 
             if data:
                 #this fixes the random noise of rotation
@@ -117,17 +120,22 @@ def main():
                 previousdata= data
 
         key = cv.waitKey(20)
-        # Exit if the 'q' key is pressed
+        #state 3 with d
         if key == ord('d'):
-            break
+            s.sendall("state3".encode())
+            received_data = s.recv(1024)
+            print(received_data)
 
         #emergency kill button with space bar
         elif key == ord(' '):
             pause = not pause
-            
             s.sendall("pause".encode())
             received_data = s.recv(1024)
             print(received_data)
+        # Exit if the 'q' key is pressed
+        elif key == ord('q'):
+            break
+            
 
     capture.release()
     cv.destroyAllWindows()

@@ -136,12 +136,24 @@ void colorSensor_Init(){
 
 std::string colorSensor_DetermineColor(){
 
-	if (!HAL_I2C_Mem_Read(&hi2c2, 0x88, 0x09, I2C_MEMADD_SIZE_8BIT, (uint8_t*)&colorData, 8, HAL_MAX_DELAY)){
+	    HAL_I2C_Mem_Read(&hi2c2, 0x88, 0x09, I2C_MEMADD_SIZE_8BIT, (uint8_t*)&colorData, 8, HAL_MAX_DELAY);
 		//stores byte data into int values used to determine color
 		greenValue = (colorData[1] << 8) | colorData[0];
 		redValue = (colorData[3] << 8) | colorData[2];
 		blueValue = (colorData[5] << 8) | colorData[4];
 
+		/*blueValue / greenValue > 2
+			return "Blue"
+		redValue / green
+			return "Red"
+		green = blue
+			return "Yellow"
+		green / blue > 2
+			return "Green"
+		if (green-red)/((green+red)/2) < 0.2
+			return "No dominant color"
+
+			*/
 		//This algorithm was written by chat GPT to find the max int value.
 		int maxValue = std::max(std::max(greenValue, redValue), blueValue);
 
@@ -153,10 +165,7 @@ std::string colorSensor_DetermineColor(){
 			return "Red";
 		else
 			return "No dominant color";
-}
-	else {
-		return "i2c error";
-	}
+
 }
 
 void enableAllMotors(){
@@ -234,21 +243,15 @@ int main(void)
      */
 
 
-  enableAllMotors();
-  driver1.set_duty_cycle(0x40);
-  driver2.set_duty_cycle(0xD0);
-  servo1.set_duty_cycle(10);
-  servo1.set_duty_cycle(15);
-  servo1.set_duty_cycle(20);
-
-
     while (1)
     {
     	//start
     	if (state == 0){
 
-    		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0, GPIO_PIN_SET);
-    		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0, GPIO_PIN_RESET);
+
+
+    		//HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0, GPIO_PIN_SET);
+    		//HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0, GPIO_PIN_RESET);
 
     		//interrupt will change the state to 1 to begin the program.
 
@@ -259,32 +262,34 @@ int main(void)
     		 //the motor drivers get enabled when coming into this state.
 
 
-
-
-
-    		//checks the light sensor so that when the robot is off the field, it will go to state 2.
-    		//adcres = getADCsimplified();
-    		adcres = 500;
     		//checks if the robot is "home"
     		//pinstate = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4);
-    		pinstate = GPIO_PIN_RESET;
+    		//pinstate = GPIO_PIN_RESET;
+
+
     		//if there is no light, meaning robot is not on the field
+    		//checks the light sensor so that when the robot is off the field, it will go to state 2.
+    		//adcres = 500;
+    		adcres = getADCsimplified();
     		if (adcres <= 400){
     			state = 2;
     		}
     		//if the robot is at home, state = 0;
-    		else if (pinstate == GPIO_PIN_SET){
-					state = 0;
-					disableAllMotors();
-			}
-    	}
+    		//else if (pinstate == GPIO_PIN_SET){
+			//		state = 0;
+			//		disableAllMotors();
+		}
+
 
 
     	//state 2: when the robot moves outside of the arena or into trouble, backtrack and then once backtrack is confirmed, go back to state 1
     	else if (state == 2){
 
-    		driver1.set_duty_cycle(0xD0);
-    		driver2.set_duty_cycle(0xD0);
+    		//drives backwards until the light sensor tells us its back on track
+    		driver1.set_direction(1);
+    		driver2.set_direction(1);
+    		driver1.set_duty_cycle(1000);
+    		driver2.set_duty_cycle(1000);
 
 
     		//checks the light sensor so that when the robot is back on the field, it will return to state 1.
@@ -292,27 +297,37 @@ int main(void)
     		//if there is light, meaning the robot is on the field
     		if (adcres >= 400){
     			state = 1;
+    			driver1.set_direction(0);
+    			driver2.set_direction(0);
+    			driver1.set_duty_cycle(0);
+    			driver2.set_duty_cycle(0);
     		}
 
     	}
 
     	//state 3: when the robot is done picking up balls, it will move to stage 3, where it will deposit balls into the corral
     	else if (state == 3){
-    		driver3.set_duty_cycle(0x7F);
-    		driver4.set_duty_cycle(0x7F);
-    		driver5.set_duty_cycle(0x7F);
+    		//driver3.set_duty_cycle(1200);
+    		//driver4.set_duty_cycle(1200);
+    		//driver5.set_duty_cycle(1200);
 
     		std::string color = colorSensor_DetermineColor();
     		if (color == "Blue"){
     			servo1.set_duty_cycle(20);
     			HAL_Delay(1000);
 				servo1.set_duty_cycle(10);
+    			HAL_Delay(1000);
+
 
     		}
     		else if (color == "Green"){
 
     		}
     		else if (color == "Red"){
+    			servo2.set_duty_cycle(20);
+    			HAL_Delay(1000);
+    			servo2.set_duty_cycle(10);
+    			HAL_Delay(1000);
 
     		}
     		else if (color == "No dominant color"){
@@ -476,7 +491,7 @@ static void MX_ADC1_Init(void)
 
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
-  sConfig.Channel = ADC_CHANNEL_5;
+  sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
@@ -608,9 +623,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 9999;
+  htim2.Init.Prescaler = 10000;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 199;
+  htim2.Init.Period = 200;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -871,16 +886,6 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : PA0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
   /*Configure GPIO pin : PA4 */
   GPIO_InitStruct.Pin = GPIO_PIN_4;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -906,8 +911,8 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	HAL_UART_Receive_IT(&huart1, (uint8_t*)&data, 1);
     if(huart == &huart1 && state ==1) {
-    	HAL_UART_Receive_IT(&huart1, (uint8_t*)&data, 1);
         //HAL_UART_Transmit(&huart2, (uint8_t*)&data, 1, 1000);
 
         if(data == '\r' && buff_idx >= 4) {
@@ -930,11 +935,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
             if(dc_initial > 0x7f) {
                 direction = 1;
                 dc_initial = 0x100 - dc_initial;
-                dc = (uint16_t)dc_initial * htim1.Init.Period / 128;
+                dc = (uint16_t)dc_initial * htim5.Init.Period / 128;
             }
             else {
                 direction = 0;
-                dc = (uint16_t)dc_initial * htim1.Init.Period / 127;
+                dc = (uint16_t)dc_initial * htim5.Init.Period / 127;
             }
 
             // update motor driver
@@ -958,7 +963,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
                 size = sprintf(msg_buff, "\nMotor %d set to reverse at duty cycle %d\r\n", driver_idx, dc);
             //HAL_UART_Transmit(&huart2, (uint8_t*)msg_buff, size, 1000);
         }
-        else if(buff_idx < 100) {
+        else if(buff_idx < 100 ) {
             msg_buff[buff_idx] = data;
             buff_idx++;
         }
@@ -971,7 +976,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		if (state == 0){
 			state = 1;
 			//i2c stuff
-			//colorSensor_Init();
+			colorSensor_Init();
 			//driver enable
 			enableAllMotors();
 			HAL_UART_Receive_IT(&huart1, (uint8_t*)&data, 1);
