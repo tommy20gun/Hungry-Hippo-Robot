@@ -1,3 +1,4 @@
+#Code guide provided by https://github.com/TemugeB/QR_code_orientation_OpenCV
 import cv2 as cv
 import numpy as np
 
