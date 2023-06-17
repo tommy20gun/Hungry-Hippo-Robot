@@ -88,7 +88,8 @@ balls from the floor up into the basket. A ball wheel at the back of the basket
 brings balls onto a shelf in a single file. Once a ball reaches the shelf, it
 passes through the color sensor and then to the first servo. This servo either
 knocks the ball back into the basket or allows it to continue rolling along the
-shelf. If the ball continues along the shelf, it reaches the second servo, which directs the ball either into the shooter or out the back of the robot to drop
+shelf. If the ball continues along the shelf, it reaches the second servo, which 
+directs the ball either into the shooter or out the back of the robot to drop
 down into a corral or onto the floor of the arena.
 
 During a match, the robot would first drive around picking up balls. The ball
