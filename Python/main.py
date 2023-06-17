@@ -17,8 +17,8 @@ from hsvcolordata import lower_ranges, upper_ranges, colors
 
 def main():
     #capture = cv.imread('Screenshot.png')
-    capture = cv.VideoCapture(1, cv.CAP_DSHOW)#'rtsp://192.168.84.58:8080/h264.sdp') #, cv.CAP_DSHOW)#2, cv.CAP_DSHOW)
-    cam_cleaner = CameraBufferCleanerThread(capture)
+    capture = cv.VideoCapture(0, cv.CAP_DSHOW)#'rtsp://192.168.84.58:8080/h264.sdp') #, cv.CAP_DSHOW)#2, cv.CAP_DSHOW)
+    #cam_cleaner = CameraBufferCleanerThread(capture)
     rescalefactor = .7
 
     #initialize ball and cart list
@@ -27,11 +27,11 @@ def main():
     corralstation = None
 
     #initializes Socket object to send serial data
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    """s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #IP_ADDRESS = "169.254.80.57"
     IP_ADDRESS = "192.168.84.134"
     PORT = 1025
-    s.connect((IP_ADDRESS, PORT))
+    s.connect((IP_ADDRESS, PORT))"""
 
     #initialize PID object
     pid = PID(.2,3,.01, setpoint= 0)
@@ -48,14 +48,14 @@ def main():
     while True:
         #read the frames of the video as a while loop to make it "look" like a video
 
-        #thereisaframe, frame = capture.read()
+        thereisaframe, frame = capture.read()
 
         #thereisaframe = True
-        #if thereisaframe and not pause:
-        if cam_cleaner.last_frame is not None:
+        if thereisaframe and not pause:
+        #if cam_cleaner.last_frame is not None:
             #frame = cv.imread('Screenshot.png')
-            #frame = rescale_frame(frame, rescalefactor)
-            frame = rescale_frame(cam_cleaner.last_frame, rescalefactor)
+            frame = rescale_frame(frame, rescalefactor)
+            #frame = rescale_frame(cam_cleaner.last_frame, rescalefactor)
             #resets ball and cart
             balls = []
             cart = None
@@ -114,25 +114,26 @@ def main():
             if data:
                 #this fixes the random noise of rotation
                 if not (data[8:10] == "D0" and previousdata[8:10] != "D0"):    
-                    s.sendall(data.encode())
+                    """s.sendall(data.encode())
                     received_data = s.recv(1024)
-                    print(received_data)
-                    #print(data)
+                    print(received_data)"""
+                    print(data)
+                    
                 previousdata= data
 
         key = cv.waitKey(20)
         #state 3 with d
         if key == ord('d'):
-            s.sendall("state3".encode())
+            """s.sendall("state3".encode())
             received_data = s.recv(1024)
-            print(received_data)
+            print(received_data)"""
 
         #emergency kill button with space bar
         elif key == ord(' '):
             pause = not pause
-            s.sendall("pause".encode())
+            """s.sendall("pause".encode())
             received_data = s.recv(1024)
-            print(received_data)
+            print(received_data)"""
         # Exit if the 'q' key is pressed
         elif key == ord('q'):
             break
