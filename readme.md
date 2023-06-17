@@ -51,9 +51,9 @@
       </ul>
     </li>
     </li>
-    <li><a href="#Mechanical-Design">Roadmap</a></li>
-    <li><a href="#Electronic-Design">Contributing</a></li>
-    <li><a href="#Software-Implementation">Usage</a></li>
+    <li><a href="#Mechanical-Design">Mechanical Design</a></li>
+    <li><a href="#Electronic-Design">Electronic Design</a></li>
+    <li><a href="#Software-Implementation">Software Implementation</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
