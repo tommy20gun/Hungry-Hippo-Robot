@@ -82,6 +82,27 @@
 ### Mechanical Design
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+Our design consists mainly of a large basket with the drive wheels, electronics,
+and battery underneath. A pair of intake rollers, driven by a gear motor, bring
+balls from the floor up into the basket. A ball wheel at the back of the basket
+brings balls onto a shelf in a single file. Once a ball reaches the shelf, it
+passes through the color sensor and then to the first servo. This servo either
+knocks the ball back into the basket or allows it to continue rolling along the
+shelf. If the ball continues along the shelf, it reaches the second servo, which directs the ball either into the shooter or out the back of the robot to drop
+down into a corral or onto the floor of the arena.
+
+During a match, the robot would first drive around picking up balls. The ball
+wheel would be turning continuously so that balls are constantly moved through
+the color sensor. Balls that match our designated color would be knocked back
+into the basket to be deposited later. All other balls would be dropped out the
+back of the robot back onto the arena. Once the robot has picked up enough balls
+of our designated color, it would pass these balls either through the shooter to
+put them into the cylinder in the center of the arena, or out the back of the
+robot to drop them into our corral. Then the robot would start picking up balls
+again and the cycle would repeat.
+
+![Robot CAD][robot_cad]
+
 <!-- Electronic Design -->
 ### Electronic Design
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -104,7 +125,7 @@ Distributed under the MIT License. See `LICENSE-MIT.txt` for more information.
 
 Tommy Xu tommy20gun00@gmail.com 
 
-Ryan Ghosh 
+Ryan Ghosh rghosh776@gmail.com
 
 Project Link: [https://github.com/tommy20gun/Hungry-Hippo-Robot](https://github.com/tommy20gun/Hungry-Hippo-Robot)
 
@@ -131,6 +152,7 @@ Project Link: [https://github.com/tommy20gun/Hungry-Hippo-Robot](https://github.
 [license-shield]: https://img.shields.io/github/license/tommy20gun/Hungry-Hippo-Robot.svg?style=for-the-badge
 [license-url]: https://github.com/tommy20gun/Hungry-Hippo-Robot/blob/master/LICENSE.txt
 [product-screenshot]: images/screenshot.png
+[robot_cad]: images/robot_cad.png
 [STM32CubeIDE]:
 [STM32Cube-url]:https://www.st.com/en/development-tools/stm32cubeide.html
 [OpenCV]:
