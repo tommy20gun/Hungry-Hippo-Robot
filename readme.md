@@ -72,7 +72,7 @@
     <table>
 	    <tr>
     	    <td style="padding:10px">
-        	    <img src="images\robotworking.gif.gif" width="400"/>
+        	    <img src="images\robotworking.gif.gif" width="600"/>
       	    </td>
             <td style="padding:10px">
             	<img src="images\arena.PNG" width="200"/>
@@ -183,7 +183,9 @@ The C++ code implements a finite state machine in the main loop with 4 states.
 
 **State 1**: 
 
-![robotstate1][robotstate1]
+<p align="center">
+  <img src="images/robotworking.gif.gif" alt="" >
+</p>
 
 The robot looks for a ball and moves towards it if it finds one.
 
@@ -193,7 +195,9 @@ Code in C++ only contains checking on the ADC reading of the light sensor. If th
 
 State 2:
 
-![robotstate2][robotstate2]
+<p align="center">
+  <img src="images/robotstate2.gif.gif" alt="" >
+</p>
 
 The purpose of state 2 is to correct the robot if it runs out of the arena. The robot will move backwards in state 2. 
 
@@ -206,10 +210,10 @@ The light sensor has a threshold value of 400 units that, when the reading is be
     <table>
 	    <tr>
     	    <td style="padding:10px">
-        	    <img src="images/colorsensor%20blue%20-%20Made%20with%20Clipchamp.gif" width="300"/>
+        	    <img src="images/colorsensor%20blue%20-%20Made%20with%20Clipchamp.gif" width="500"/>
       	    </td>
             <td style="padding:10px">
-            	<img src="images/redball%20-%20Made%20with%20Clipchamp.gif" width="300"/>
+            	<img src="images/redball%20-%20Made%20with%20Clipchamp.gif" width="500"/>
             </td>
         </tr>
     </table>
@@ -225,7 +229,9 @@ This is the ball sorting state. The color sensor is an I2C device that returns v
 
 **State 4**
 
-![pause][pause]
+<p align="center">
+  <img src="images/pause.gif" alt="" >
+</p>
 
 This is the Pause state. The sole purpose of this state is to act as the dead man’s switch. The code can be paused at any point in time where the user presses ‘Space Bar’ with the Python program opened. The computer would send an instruction to the Raspberry Pi that triggers a GPIO interrupt in the MCU to put the robot into its pause state. 
 
@@ -234,7 +240,9 @@ This is the Pause state. The sole purpose of this state is to act as the dead ma
 
 ### Opencv Python
 
-![opencvreactivemotorduty][opencvreactivemotorduty]
+<p align="center">
+  <img src="images/reactivemotorduty.gif" alt="" >
+</p>
 
 
 Within Cpython, the OpenCV Library is implemented. The order of logic is as follows. 
