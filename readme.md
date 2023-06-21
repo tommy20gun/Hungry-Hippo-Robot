@@ -52,7 +52,7 @@
     </li>
     </li>
     <li><a href="#Mechanical-Design">Mechanical Design</a></li>
-    <li><a href="#Electronic-Design">Electronic Design</a></li>
+    <li><a href="#Electrical-Design">Electrical Design</a></li>
     <li><a href="#Software-Implementation">Software Implementation</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -65,7 +65,7 @@
 <!-- ABOUT THE PROJECT -->
 <h2 align="center">About This Project</h2>
 
----
+
 
 
 <div id="image-table">
@@ -75,7 +75,7 @@
         	    <img src="images\robotworking.gif.gif" width="400"/>
       	    </td>
             <td style="padding:10px">
-            	<img src="images\arena.png" width="200"/>
+            	<img src="images\arena.PNG" width="200"/>
             </td>
         </tr>
     </table>
@@ -104,18 +104,18 @@ The Hungry Hippo Robot is a robot built to play a competitive game of Hungry Hip
 
 * [<img src="images/stm32cubeIDE.PNG" alt= “” width="50" height="25">][STM32Cube-url]
 *  [<img src="images/opencvlogo.PNG" alt= “” width="50" height="25">][OpenCV-url]
-*  [<img src="images/raspberrypi.png" alt= “” width="50" height="25">][raspberrypi-url]
+*  [<img src="images/raspberrypi.PNG" alt= “” width="50" height="25">][raspberrypi-url]
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- Mechanical Design -->
 <h2 align="center">Mechanical Design</h2>
 
----
+
 
 
 ![Robot CAD][robot_cad]
 
-<a href="https://github.com/tommy20gun/Hungry-Hippo-Robot"><strong>Explore the CAD » </strong> </a>
+<a href="https://drive.google.com/drive/folders/1YNU8u0PBZDRhuVai56NaG6UMePA88sIG?usp=sharing"><strong>Explore the CAD » </strong> </a>
 
 Our robot design features a large basket housing the drive wheels, electronics, and battery, with intake rollers bringing balls from the floor into the basket. A ball wheel on the back of the basket arranges the balls in a single file on a shelf. The balls then pass through a color sensor and a series of servos. If a ball matches the team color it continues rolling along the shelf, otherwise, it is knocked back into the basket. 
 
@@ -126,7 +126,7 @@ During a match, the robot drives around to collect balls, separating designated-
 <!-- Electronic Design -->
 <h2 align="center">Electrical Design</h2>
 
----
+
 ![PCB][pcb]
 
 <a href="https://github.com/tommy20gun/Hungry-Hippo-Robot"><strong>Explore the eCAD » </strong> </a>
@@ -164,57 +164,88 @@ The custom PCB takes power from the 3S LiPo rechargable battery. Current passes 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- Software Implementation -->
-<h2 align="center">Software Implmentation</h2>
+<h2 align="center">Software Implementation</h2>
 
----
 
-### Wiring and wireless communication
 
-The robot connects to a computer in 3 steps. First, we use UART to connect a Raspberry Pi to the MCU. The Raspberry Pi hosts a server, which a computer can connect to via Wifi Hotspot. This way, master control and emergency kill switch can come from a user controlling a computer. Also, we attached a wireless camera for OpenCV that must use the processing power of that computer.
+### Achieving Wireless Communication
 
-There are two major sections of code for the robot: the C++ code for the microcontroller, and python code for the computer and Raspberry Pi.
+![wirelesscommunication][wirelesscom]
 
-STM32IDE - C++
-The C++ code uses a finite state machine in the main loop with 4 states.
+The robot connects to a computer in 3 steps. First, we use UART to connect a Raspberry Pi to the MCU. The Raspberry Pi hosts a server, which a computer, a camera, and the raspberry Pi itself can connect to. This enables communication between the computer running Python and the Robot. 
 
-State 0: Start state. In this state, the robot does nothing except wait for a signal to start. A GPIO interrupt triggered by the Raspberry PI (triggered by the user) brings the state machine to state 1.
 
-State 1: The robot looks for a ball and moves towards it if it sees one. Here, the crux of the logic is inside the python scripts that were written for the robot. Here is where the UART1 Receive Interrupt is active. The robot will actively take motor duty cycle data given by the CPython program through UART1 to know how to drive itself. 
-The only thing insde State 1 in the C++ code is to check the ADC reading of the light sensor. If the light reading falls below a certain threshold, the state machine will move into state 2. More on state 2 in the next section.
+### STM32IDE - C++
+
+The C++ code implements a finite state machine in the main loop with 4 states.
+
+**State 0**: Start state. In this state, the robot does nothing except wait for a signal to start. A GPIO interrupt triggered by the Raspberry PI (triggered by the user) brings the state machine to state 1.
+
+**State 1**: 
+
 ![robotstate1][robotstate1]
 
-State 2:  The purpose of state 2 is to correct the robot if it runs out of the arena. The light sensor actually has a good threshold value of 400 units that, when faced downward, determine if the robot is in the arena (where the floor is white) or outside of the arena (where the floor is grey). 
-This is shown in a video demonstration where when we blast the light sensor with light, the state remains at 1. When the light sensor moves away from the light, the robot will go to state 2 and move backwards. 
+The robot looks for a ball and moves towards it if it finds one.
+
+Here, the crux of the logic is inside the python scripts that were written for the robot. Here is where the UART1 Receive Interrupt is active. The robot will actively take motor duty cycle data given by the CPython program through UART1 to know how to drive itself. 
+
+Code in C++ only contains checking on the ADC reading of the light sensor. If the light reading falls below a certain threshold, the state machine will move into state 2.
+
+State 2:
+
 ![robotstate2][robotstate2]
 
-State 3: This is the ball sorting state. Due to time constraints, we were not able to fully implement this portion of the robot. However, the color sensor and servos, as well as any motors function properly. One would only need to attach the ball carrier to make this work.
-The color sensor is an I2C device that returns values of RGB based on what it sees. The code initializes all the necessary registers for I2C reading. Then the determineColor() function selects the RGB value with the biggest magnitude and determines the ball’s color based on the color with the biggest signal. For example, if blue = 1052, green = 870, red = 213, then the color was determined to be “Blue”.
-The shortcoming of this algorithm was that it could not detect yellow balls, as yellow was a combination of blue and green. I wrote, but commented out, an algorithm where color values are compared to each other and then matched to a ratio, as all colors are just a ratio of RGB. This algorithm is good in theory but was not tested for accuracy. 
+The purpose of state 2 is to correct the robot if it runs out of the arena. The robot will move backwards in state 2. 
 
-![bluecolorball][bluecolorball]
-![redcolorball][redcolorball]
+The light sensor has a threshold value of 400 units that, when the reading is below, will automatically trigger the robot into state 2. When the sensor is faced downward, the light value should only drop below 400 units when the robot moves outside of the arena. 
 
-State 4: This is the Pause state. The sole purpose of this state is to act as the dead man’s switch. The code can be paused at any point in time where the user presses ‘Space Bar’ with the Python program opened. The computer would send an instruction to the Raspberry Pi that triggers a GPIO interrupt in the MCU to put the robot into its pause state. 
+
+**State 3** 
+
+<div id="image-table">
+    <table>
+	    <tr>
+    	    <td style="padding:10px">
+        	    <img src="images/colorsensor%20blue%20-%20Made%20with%20Clipchamp.gif" width="300"/>
+      	    </td>
+            <td style="padding:10px">
+            	<img src="images/redball%20-%20Made%20with%20Clipchamp.gif" width="300"/>
+            </td>
+        </tr>
+    </table>
+</div>
+
+Blue ping pong ball (left), Red Ping pong ball (right).
+
+This is the ball sorting state. The color sensor is an I2C device that returns values of RGB based on what it sees. The determineColor() function selects the RGB value with the biggest magnitude and determines the ball’s color based on the color with the biggest signal. A blue ping pong ball will trigger the left servo. A red ping pong ball will trigger the right servo. A green ping pong ball resets the servos.  
+
+*Due to time constraints, we were not able to fully implement this portion of the robot.
+
+
+
+**State 4**
+
 ![pause][pause]
+
+This is the Pause state. The sole purpose of this state is to act as the dead man’s switch. The code can be paused at any point in time where the user presses ‘Space Bar’ with the Python program opened. The computer would send an instruction to the Raspberry Pi that triggers a GPIO interrupt in the MCU to put the robot into its pause state. 
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-This portion of code took up the most time. However, I will not explain each class as it gets complicated quickly. I will only explain the logic of the Python code. 
+### Opencv Python
 
-![Opencvdemo][opencvdemo]
+![opencvreactivemotorduty][opencvreactivemotorduty]
 
-Within Cpython, the OpenCV Library is implemented. The order of logic is as follows. The camera detects Ball and Cart objects and sets the robot to spin in a circle until the front of the robot faces the ball. The code to make the robot spin in circle is M130M2CF.
 
-When the robot faces the ball, then it will activate a proportional controller that drives it towards the ball to capture it. Further, if the robot is closer to the ball, the duty cycle will continuously decrease to 0 until the robot touches the ball. Since the ball was so close to the “cart”. The motor duty cycle was M1E and M2E. 0x0E is in hexadecimal. If there are no balls, the Python program will send an instruction to the Raspberry Pi to trigger an interrupt for the MCU to move the state machine into state 3.
-The Camera is wirelessly connected to the CPython program through the IPcamera app on the phone. Distortion matrices were used to calibrate our camera. 
-CPython is active at all times and sends motor duty cycle to the robot at all times, but the MCU makes it so that duty cycle data can control the robot ONLY in state 1. The program sends data to a Raspberry Pi hosting a server over iPV4 Wireless communication, which is a descriptive way of saying a Wifi Hotspot. Python’s socket class was used to allow this to function.
+Within Cpython, the OpenCV Library is implemented. The order of logic is as follows. 
 
-Raspberry Pi Python
+* The camera detects Ball and Cart objects and sets the robot to spin in a circle until the front of the robot faces the ball.
 
-The Raspberry Pi hosts a server on a Wifi Hotspot that allows any users to connect to it. Thus the camera, computer, and Raspberry Pi needed to be on the same network for this to work. The Pi opens a socket and the computer sends data over the socket. Then, the Raspberry Pi determines whether the data sent was a motor duty cycle, an instruction to pause, or an instruction to trigger state3. Once it deciphers this, it then sends the correct instruction to the MCU.
+* When the robot faces the ball, then it will activate a proportional controller (P-controller) that drives it towards the ball to capture it.
 
-If it is a motor duty cycle, the Raspberry Pi encodes the string into UTF-8 format and sends the byte data over wired serial UART1 into the MCU. An interrupt is triggered on the MCU to read this data. IF the Pi receives a Pause instruction, a GPIO pin is toggled that triggers a different interrupt on the MCU to pause. Finally, if the Pi receives a State 3 instruction, another GPIO pin is toggled to trigger an interrupt on the MCU to move the program into state 3. 
-The Raspberry Pi is the device that worked the most flawlessly. We were very lucky to not have to deal with RC or Bluetooth.
+* If there are no balls, the Python program will send an instruction to the Raspberry Pi to trigger an interrupt for the MCU to move the state machine into state 3.
+ 
+* CPython is active at all times and sends motor duty cycle to the robot at all times, but the MCU only activates Python control in Robot's State 1.
 
 <!-- LICENSE -->
 ## License
@@ -239,7 +270,7 @@ Project Link: [https://github.com/tommy20gun/Hungry-Hippo-Robot](https://github.
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-* Charley Refvem: Prof. Mechanical Engineering
+* Charlie Refvem: Prof. Mechanical Engineering
 * [https://github.com/TemugeB/QR_code_orientation_OpenCV](https://github.com/TemugeB/QR_code_orientation_OpenCV)
 * [https://realpython.com/python-sockets/](https://realpython.com/python-sockets/)
 * [https://stackoverflow.com/questions/30032063/opencv-videocapture-lag-due-to-the-capture-buffer](https://stackoverflow.com/questions/30032063/opencv-videocapture-lag-due-to-the-capture-buffer)
@@ -272,3 +303,6 @@ Project Link: [https://github.com/tommy20gun/Hungry-Hippo-Robot](https://github.
 [pause]:images/pause.gif
 [arena]:images/arena.PNG
 [back]:images/robotback.jpg
+[wirelesscom]:images/wireless%20communication.PNG
+[opencvcartdetection]:images/ball%20cart%20detection.gif
+[opencvreactivemotorduty]:images/reactivemotorduty.gif
