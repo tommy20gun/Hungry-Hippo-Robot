@@ -183,9 +183,9 @@ The robot connects to a computer in 3 steps. First, we use UART to connect a Ras
 
 Within Cpython, the OpenCV Library is implemented. The order of logic is as follows. 
 
-* The camera detects Ball and Cart objects and sets the robot to spin in a circle until the front of the robot faces the ball.
+* The camera detects Ball and Cart objects and sets the robot to spin in a circle until the front of the robot faces the ball. Motor Duty: "M130\r\nM2CF\r\n"
 
-* When the robot faces the ball, then it will activate a proportional controller (P-controller) that drives it towards the ball to capture it.
+* When the robot faces the ball, then it will activate a proportional controller (P-controller) that drives it towards the ball to capture it. This is shown in the video above, where the duty cycle changes as I move the ball away from the "cart"
 
 * If there are no balls, the Python program will send an instruction to the Raspberry Pi to trigger an interrupt for the MCU to move the state machine into state 3.
  
